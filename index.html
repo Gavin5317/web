@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端 viewport 优化：禁止缩放，适配刘海屏 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f0c29">
+    <title>Gavin5317的导航网站</title>
+    <style>
+        /* ========== 全局样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* 移动端点击时去掉蓝色高亮 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            /* 防止 iOS 横屏时字体被放大 */
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+            /* 使用 dvh 适配移动端浏览器地址栏变化，旧浏览器回退到 vh */
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* 安全区域内边距（适配刘海屏/挖孔屏） */
+            padding: calc(2rem + env(safe-area-inset-top)) calc(1.5rem + env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) calc(1.5rem + env(safe-area-inset-left));
+            color: #f0eef8;
+            /* 防止移动端横向滚动 */
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* ========== 标题区域 ========== */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 6vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            background: linear-gradient(to right, #a78bfa, #7dd3fc, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+            margin-bottom: 0.6rem;
+            line-height: 1.25;
+            /* 长标题自动换行 */
+            word-break: break-word;
+        }
+
+        .header p {
+            color: #b0a8d4;
+            font-size: clamp(0.8rem, 3.2vw, 1.05rem);
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+
+        /* ========== 按钮卡片网格 ========== */
+        .nav-grid {
+            display: grid;
+            /* 自适应列数：最小 260px，自动填充 */
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: 1.5rem;
+            justify-content: center;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* ========== 单个导航卡片 ========== */
+        .nav-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 2rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            /* 确保卡片高度一致 */
+            height: 100%;
+        }
+
+        /* 卡片顶部装饰渐变条 */
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #a78bfa, #7dd3fc, #f0abfc);
+            opacity: 0.8;
+            border-radius: 24px 24px 0 0;
+        }
+
+        /* 悬停效果：仅在支持悬停的设备上启用（避免触屏误触） */
+        @media (hover: hover) and (pointer: fine) {
+            .nav-card:hover {
+                transform: translateY(-6px) scale(1.02);
+                border-color: rgba(167, 139, 250, 0.4);
+                box-shadow: 0 20px 60px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                background: rgba(255, 255, 255, 0.09);
+            }
+        }
+
+        /* 触屏设备按下反馈 */
+        @media (hover: none) {
+            .nav-card:active {
+                transform: scale(0.985);
+                border-color: rgba(167, 139, 250, 0.5);
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* 卡片图标区 */
+        .card-icon {
+            font-size: clamp(2rem, 8vw, 2.8rem);
+            margin-bottom: 0.8rem;
+            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.5));
+            line-height: 1;
+        }
+
+        /* 卡片标题 */
+        .card-title {
+            font-size: clamp(1.05rem, 4.5vw, 1.35rem);
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        /* 密码行 */
+        .card-password {
+            font-size: clamp(0.8rem, 3.4vw, 0.95rem);
+            color: #c4b5fd;
+            margin-bottom: 1.5rem;
+            background: rgba(167, 139, 250, 0.12);
+            padding: 0.45rem 1rem;
+            border-radius: 50px;
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-password span {
+            font-weight: 700;
+            color: #e0d6ff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.05em;
+        }
+
+        /* 打开按钮 */
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.85rem 1.6rem;
+            /* 触摸目标最小高度 48px，符合移动端可访问性标准 */
+            min-height: 48px;
+            border: none;
+            border-radius: 60px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: #ffffff;
+            font-size: clamp(0.9rem, 3.6vw, 1rem);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+            margin-top: auto;
+            width: 100%;
+            /* 移动端点击时不选中文本 */
+            -webkit-user-select: none;
+            user-select: none;
+            /* 确保按钮可点击 */
+            touch-action: manipulation;
+        }
+
+        /* 悬停效果仅限桌面端 */
+        @media (hover: hover) and (pointer: fine) {
+            .card-btn:hover {
+                background: linear-gradient(135deg, #6d28d9, #9333ea);
+                box-shadow: 0 10px 32px rgba(124, 58, 237, 0.6);
+                transform: translateY(-2px);
+            }
+            .card-btn:hover .arrow {
+                transform: translateX(4px);
+            }
+        }
+
+        /* 触屏按下反馈 */
+        @media (hover: none) {
+            .card-btn:active {
+                background: linear-gradient(135deg, #6d28d9, #9333ea);
+                transform: scale(0.97);
+                box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
+            }
+        }
+
+        .card-btn .arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            margin-top: 3rem;
+            color: #6b5f9e;
+            font-size: clamp(0.7rem, 2.8vw, 0.85rem);
+            letter-spacing: 0.5px;
+            text-align: center;
+            line-height: 1.6;
+            padding: 0 1rem;
+            /* 底部安全区适配 */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* ========== 空状态占位提示 ========== */
+        .empty-hint {
+            color: #7a6fa8;
+            font-size: 1.05rem;
+            text-align: center;
+            padding: 4rem 2rem;
+            border: 2px dashed rgba(167, 139, 250, 0.25);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            grid-column: 1 / -1;
+        }
+
+        /* ========== 小屏手机优化 ========== */
+        @media (max-width: 480px) {
+            body {
+                padding: calc(1.5rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left));
+                /* 小屏时改为顶部对齐，避免内容被挤压 */
+                justify-content: flex-start;
+            }
+
+            .header {
+                margin-bottom: 2rem;
+            }
+
+            .nav-grid {
+                gap: 1rem;
+            }
+
+            .nav-card {
+                padding: 1.6rem 1.3rem;
+                border-radius: 20px;
+            }
+
+            .card-password {
+                padding: 0.4rem 0.85rem;
+            }
+
+            .card-btn {
+                padding: 0.8rem 1.2rem;
+                min-height: 50px;
+            }
+        }
+
+        /* ========== 平板优化（480px - 900px） ========== */
+        @media (min-width: 481px) and (max-width: 900px) {
+            .nav-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 1.25rem;
+            }
+
+            .nav-card {
+                padding: 1.7rem 1.5rem;
+            }
+        }
+
+        /* ========== 横屏手机优化 ========== */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                justify-content: flex-start;
+                padding-top: calc(1rem + env(safe-area-inset-top));
+            }
+
+            .header {
+                margin-bottom: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header p {
+                font-size: 0.8rem;
+            }
+
+            .footer {
+                margin-top: 1.5rem;
+            }
+        }
+
+        /* ========== 超大屏优化 ========== */
+        @media (min-width: 1400px) {
+            .nav-grid {
+                max-width: 1200px;
+            }
+        }
+
+        /* ========== 减少动画偏好 ========== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 标题 ===== -->
+    <header class="header">
+        <h1>🌟 Gavin5317的导航网站</h1>
+        <p>常用网站一键直达 · 资源下载不迷路</p>
+    </header>
+
+    <!-- ===== 导航按钮网格 ===== -->
+    <main class="nav-grid" id="navGrid">
+
+        <!-- ============================================
+             我的世界 JAVA 版下载 卡片
+             ============================================ -->
+        <div class="nav-card">
+            <div class="card-icon">⛏️</div>
+            <div class="card-title">我的世界 JAVA 版下载</div>
+            <div class="card-password">
+                🔑 密码：<span>PCL2</span>
+            </div>
+            <a
+                href="https://ltcat.lanzouv.com/b0aj6gsid"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="card-btn"
+            >
+                <span>前往下载</span>
+                <span class="arrow">→</span>
+            </a>
+        </div>
+
+        <!-- 
+        ✨ 要添加更多按钮，复制上面整个 .nav-card 块，修改以下内容即可：
+           - .card-icon 图标（emoji 或文字）
+           - .card-title 按钮名称
+           - .card-password span 密码（没有密码可删掉整个 .card-password 行）
+           - <a> 的 href 改为目标网址
+        -->
+
+    </main>
+
+    <!-- ===== 页脚 ===== -->
+    <footer class="footer">
+        © 2026 Gavin5317的导航网站 · 点击按钮自动打开新标签页
+    </footer>
+
+    <!-- ===== JavaScript：动态验证 + 控制台友好提示 ===== -->
+    <script>
+        (function () {
+            'use strict';
+
+            // 获取所有导航按钮
+            const navCards = document.querySelectorAll('.nav-card');
+
+            // 初始化时在控制台打印已加载的导航项
+            if (navCards.length > 0) {
+                console.log(`✅ Gavin5317的导航网站加载完成，共 ${navCards.length} 个快捷按钮`);
+                navCards.forEach((card, index) => {
+                    const title = card.querySelector('.card-title')?.textContent?.trim() || '未知';
+                    const link = card.querySelector('.card-btn')?.href || '#';
+                    console.log(`   ${index + 1}. ${title} → ${link}`);
+                });
+            } else {
+                const grid = document.getElementById('navGrid');
+                if (grid) {
+                    grid.innerHTML = '<div class="empty-hint">📭 暂无导航按钮，请在 HTML 中复制 .nav-card 块添加</div>';
+                }
+                console.warn('⚠️ 没有找到任何导航卡片，请检查 HTML 结构');
+            }
+
+            // 为所有外部链接按钮添加点击日志
+            document.querySelectorAll('.card-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const title = this.closest('.nav-card')?.querySelector('.card-title')?.textContent?.trim() || '未知';
+                    console.log(`🔗 打开导航：${title} → ${this.href}`);
+                });
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
