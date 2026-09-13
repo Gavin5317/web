@@ -176,26 +176,26 @@
             font-size: 1.05em;
         }
 
-        /* 打开按钮 */
+        /* 打开按钮 —— 尺寸整体缩小 */
         .card-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 0.85rem 1.6rem;
-            /* 触摸目标最小高度 48px，符合移动端可访问性标准 */
-            min-height: 48px;
+            gap: 6px;                  /* 图标与文字间距略微减小 */
+            padding: 0.6rem 1.1rem;     /* 原为 0.85rem 1.6rem，明显缩小 */
+            /* 触摸目标最小高度 40px，仍然适合移动端点击 */
+            min-height: 40px;
             border: none;
             border-radius: 60px;
             background: linear-gradient(135deg, #7c3aed, #a855f7);
             color: #ffffff;
-            font-size: clamp(0.9rem, 3.6vw, 1rem);
+            font-size: clamp(0.8rem, 3.2vw, 0.9rem); /* 字体略微变小 */
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4); /* 阴影略减 */
             margin-top: auto;
             width: 100%;
             /* 移动端点击时不选中文本 */
@@ -209,11 +209,11 @@
         @media (hover: hover) and (pointer: fine) {
             .card-btn:hover {
                 background: linear-gradient(135deg, #6d28d9, #9333ea);
-                box-shadow: 0 10px 32px rgba(124, 58, 237, 0.6);
-                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(124, 58, 237, 0.55);
+                transform: translateY(-1px);
             }
             .card-btn:hover .arrow {
-                transform: translateX(4px);
+                transform: translateX(3px);
             }
         }
 
@@ -222,13 +222,13 @@
             .card-btn:active {
                 background: linear-gradient(135deg, #6d28d9, #9333ea);
                 transform: scale(0.97);
-                box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
+                box-shadow: 0 3px 12px rgba(124, 58, 237, 0.5);
             }
         }
 
         .card-btn .arrow {
             transition: transform 0.3s ease;
-            font-size: 1.2rem;
+            font-size: 1rem;           /* 箭头略微缩小 */
             line-height: 1;
         }
 
@@ -283,9 +283,11 @@
                 padding: 0.4rem 0.85rem;
             }
 
+            /* 小屏按钮同步缩小 */
             .card-btn {
-                padding: 0.8rem 1.2rem;
-                min-height: 50px;
+                padding: 0.55rem 1rem;
+                min-height: 42px;
+                font-size: clamp(0.75rem, 3vw, 0.85rem);
             }
         }
 
